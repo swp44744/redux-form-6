@@ -10,7 +10,7 @@ class PostNew extends Component {
   };
 
   onSubmit(props) {
-  //  console.log(props);
+   // console.log(props);
     this.props.createPost(props)
       .then(() => {
         //blog post has been created, navigate the user to the index
@@ -19,6 +19,7 @@ class PostNew extends Component {
         this.context.router.push('/');
       });
   }
+
 
   render() {
     const {
@@ -31,7 +32,10 @@ class PostNew extends Component {
    // const handleSubmit = this.props.handleSubmit; // both lines means exact same thing
     // const title = this.props.fields.title;
  //   console.log('title: ',title);
+
+
     return(
+      <div>
       <form onSubmit = {handleSubmit(this.onSubmit.bind(this))}>
         {/*<form onSubmit = {handleSubmit(this.props.createPost)}>*/}
         <h3>Create A New Post</h3>
@@ -40,6 +44,7 @@ class PostNew extends Component {
           <input type ="text" className="form-control" {...title} />
           <div className="text-help">
             {title.touched ? title.error : ''}
+            {console.log("Title: "+title)}
           </div>
         </div>
 
@@ -63,6 +68,7 @@ class PostNew extends Component {
         <Link to = "/" className="btn btn-danger">Cancel</Link>
 
       </form>
+      </div>
     );
   }
 }
