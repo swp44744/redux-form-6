@@ -4,6 +4,11 @@ import { connect } from 'react-redux';
 import validate from './validate';
 import { createForm } from '../actions/index';
 import  Circle  from './circle';
+import Row from 'react-bootstrap/lib/Row';
+import Col from 'react-bootstrap/lib/Col';
+import calculatePercentage from '../util/calculatePercentage';
+import { renderField, renderHobbies } from '../util/renderFields';
+import { bindActionCreators } from 'redux';
 
 
 
@@ -14,37 +19,69 @@ class SimpleForm extends Component {
 }
 
   onSubmit(props){
-   // this.props.createForm(props);
+    this.props.createForm(props);
     // dipatch action
+    //console.log(props);
   }
 
   render(){
-    const { fields : { firstName, lastName, age, gender },handleSubmit, pristine, reset, submitting } = this.props;
+    const { handleSubmit, pristine, reset, submitting } = this.props;
     return(
       <div className="form-group">
       <form onSubmit={handleSubmit(this.onSubmit.bind(this))} >
-        <div>
-        <Field className="form-control" name="firstName" type="text" component={renderField} label="Enter your first name"/>
-          <br />
-        <Field name="LastName" type="text" component={renderField} label="Enter your Last name"/>
-          <br />
-        <Field name="age" type="text" component={renderField} label="Enter your Age"/>
-          <br />
-        <Field name="gender" type="text" component={renderField} label="Enter your Gender"/>
-          <br />
-          <Field name="color" type="text" component={renderField} label="Enter your color"/>
-          </div>
-        <div>
-          <button className="btn btn-primary" type="submit" disabled={submitting}>Submit</button>
-        </div>
+        <Row>
+          <Col md={8}>
+            <Row>
+              <Col md={12}>
+                <Field className="form-control" name="firstName" type="text" component={renderField} label="Enter your first name"/>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <Field name="LastName" type="text" component={renderField} label="Enter your Last name"/>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <Field name="age" type="text" component={renderField} label="Enter your Age"/>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <Field name="gender" type="text" component={renderField} label="Enter your Gender"/>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <Field name="color" type="text" component={renderField} label="Enter your color"/>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <br />
+                <FieldArray name="personInfo" component={renderHobbies} />
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                <br />
+                <button className="btn btn-primary" type="submit" disabled={submitting}>Submit</button>
+              </Col>
+            </Row>
+          </Col>
+          <Col md={4}>
+            <Circle
+              percent={this.props.progressPercent}
+              strokeWidth="3"
+              trailWidth="3"
+              strokeLinecap="round"
+              strokeColor="black"
+            />
+            {console.log('data got from reducer',this.props.dataFromReducer)}
+          </Col>
+        </Row>
       </form>
-      <Circle
-        percent={this.props.progressPercent}
-        strokeWidth="3"
-        trailWidth="3"
-        strokeLinecap="round"
-        strokeColor="black"
-      />
+
         {/*{console.log('props: ',this.props)}*/}
         {/*{console.log('Progress Percentage: ',parseInt(this.props.progressPercent))}*/}
         </div>
@@ -53,60 +90,29 @@ class SimpleForm extends Component {
   }
 }
 
-
-const renderField = ({ input, label, type, meta: { touched, error } }) => (
-  <div>
-    <label>{label}</label>
-    <div>
-      <input {...input} type={type} placeholder={label} />
-      {touched && error && <span>{error}</span>}
-    </div>
-    {/*{console.log('renderfields: ',input)}*/}
-  </div>
-
-);
-
-
 const selector = formValueSelector('simpleFormFields');
 
 
-
 function mapStateToProps(state) {
-  const registeredFields = state.form.simpleFormFields.registeredFields|| {};
-  const fields = state.form.simpleFormFields.fields || {};
-  const syncErrors = state.form.simpleFormFields.syncErrors|| {};
-  var counter=0;
-  var progressPercent=0;
-  var totalLength=0;
-
-      totalLength = registeredFields.length;
-      Object.keys(fields).map((key, index)=>{
-        //console.log('fields: ', fields[key]);
-
-        if(fields[key].touched && !(syncErrors[key])) {
-          counter ++;
-        }
-
-      });
-  if(totalLength > 0) {
-    progressPercent = (counter*100)/totalLength;
-
-  }
-
-
-  console.log('whole state',state);
+  const progressPercent = calculatePercentage(state)
+  //console.log('whole state',state);
   return{
-    progressPercent
+    progressPercent,
+    dataFromReducer : state.posts.formData
   }
 }
 
 
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({ createForm }, dispatch);
+}
 
-SimpleForm = connect((mapStateToProps),null)(SimpleForm);
+
+SimpleForm = connect((mapStateToProps),(mapDispatchToProps))(SimpleForm);
 
 
 export default reduxForm ({
   form: 'simpleFormFields',
-  fields:['firstName','lastName','gender','age'],
   validate
-}, null, { createForm })(SimpleForm);
+}, null, null)(SimpleForm);
+
