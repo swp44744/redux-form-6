@@ -8,7 +8,6 @@ import SimpleForm from './components/simple-form';
 export default (
   <Route path="/" component = {App}>
     <IndexRoute component={SimpleForm} />
-
   </Route>
 
 );

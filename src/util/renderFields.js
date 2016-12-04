@@ -1,5 +1,6 @@
 import React,{ Component } from 'react';
 import { Field } from 'redux-form';
+import  RenderVariations from '../components/variations';
 
 
 export const renderHobbies = ({fields, meta:{ touched, error }}) => (
@@ -18,6 +19,25 @@ export const renderHobbies = ({fields, meta:{ touched, error }}) => (
       )
     }
   </ul>
+);
+
+export const renderAttributes = ({fields, meta:{ touched, error }}) => (
+  <ul>
+    <li>
+      <RenderVariations/>
+      <button type="link" onClick={()=>fields.push({})}>Add options</button>
+    </li>
+    {
+      fields.map((attItem,index) =>
+        <li key= {index}>
+          <RenderVariations/>
+          <button className="btn btn-secondary" type="button" onClick={() => fields.remove(index)}>R</button>
+          <br />
+        </li>
+      )
+    }
+  </ul>
+
 );
 
 

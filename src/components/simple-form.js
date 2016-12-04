@@ -1,14 +1,16 @@
 import React,{ Component } from 'react';
+import ReactDOM from 'react-dom';
 import { Field, FieldArray, reduxForm, formValueSelector } from 'redux-form';
 import { connect } from 'react-redux';
 import validate from './validate';
-import { createForm } from '../actions/index';
+import { createForm, productAttributes } from '../actions/index';
 import  Circle  from './circle';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
-import calculatePercentage from '../util/calculatePercentage';
-import { renderField, renderHobbies } from '../util/renderFields';
+import calculatePercentage from '../util/calculatePercentage1';
+import { renderField, renderHobbies,renderAttributes } from '../util/renderFields';
 import { bindActionCreators } from 'redux';
+import  RenderVariations from './variations';
 
 
 
@@ -16,6 +18,10 @@ class SimpleForm extends Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      showComponent: false,
+    };
 }
 
   onSubmit(props){
@@ -23,6 +29,12 @@ class SimpleForm extends Component {
     // dipatch action
     //console.log(props);
   }
+
+  onAddVariationClick() {
+    this.setState({ showComponent: true});
+    this.props.productAttributes();
+  }
+
 
   render(){
     const { handleSubmit, pristine, reset, submitting } = this.props;
@@ -64,6 +76,12 @@ class SimpleForm extends Component {
             </Row>
             <Row>
               <Col md={12}>
+                <button type="button" className="btn primary-btn pull-right" onClick={this.onAddVariationClick.bind(this)}>Add</button>
+                { this.state.showComponent ? <FieldArray name="attributes" component={renderAttributes} /> : null }
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
                 <br />
                 <button className="btn btn-primary" type="submit" disabled={submitting}>Submit</button>
               </Col>
@@ -78,6 +96,8 @@ class SimpleForm extends Component {
               strokeColor="black"
             />
             {console.log('data got from reducer',this.props.dataFromReducer)}
+            {console.log('personalInfo',this.props.personalInfo)}
+            {/*            {console.log('atts got from reducer',this.props.productAtts)}*/}
           </Col>
         </Row>
       </form>
@@ -95,16 +115,22 @@ const selector = formValueSelector('simpleFormFields');
 
 function mapStateToProps(state) {
   const progressPercent = calculatePercentage(state)
+  const firstName = selector(state,'firstName');
+  const personalInfo = selector(state,'personInfo');
+//  console.log('called map state to props');
   //console.log('whole state',state);
   return{
     progressPercent,
-    dataFromReducer : state.posts.formData
+    firstName,
+    personalInfo,
+    dataFromReducer : state.posts.formData,
+    productAtts : state.posts.prodAtts
   }
 }
 
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ createForm }, dispatch);
+  return bindActionCreators({ createForm, productAttributes }, dispatch);
 }
 
 
